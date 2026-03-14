@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>한성대학교 축제 아카이브</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a class="logo" href="#">HSU FESTA</a>
+      <ul class="nav-links">
+        <li><a href="#timeline">역사</a></li>
+        <li><a href="#gallery">갤러리</a></li>
+        <li><a href="#memory">추억 남기기</a></li>
+        <li><a href="#archive">아카이브</a></li>
+      </ul>
+      <button class="hamburger" id="hamburger" aria-label="메뉴">&#9776;</button>
+    </div>
+    <ul class="mobile-menu" id="mobileMenu">
+      <li><a href="#timeline">역사</a></li>
+      <li><a href="#gallery">갤러리</a></li>
+      <li><a href="#memory">추억 남기기</a></li>
+      <li><a href="#archive">아카이브</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <canvas id="heroCanvas"></canvas>
+    <div class="hero-bg"></div>
+    <!-- 떠다니는 빛 오브 -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="orb orb-4"></div>
+    <div class="hero-content" id="heroContent">
+      <p class="hero-sub">한성대학교 대동제</p>
+      <h1 class="hero-title">Festival<br><span>Archive</span></h1>
+      <p class="hero-desc">축제의 모든 순간을 기록하고, 함께 만들어가는 아카이브</p>
+      <div class="hero-btns">
+        <a href="#timeline" class="btn btn-primary">역사 탐방</a>
+        <a href="#memory" class="btn btn-outline">추억 남기기</a>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <span>스크롤</span>
+      <div class="scroll-line"></div>
+    </div>
+  </header>
+
+  <!-- STATS -->
+  <section class="stats">
+    <div class="stats-inner">
+      <div class="stat-item">
+        <span class="stat-num" data-target="28">0</span>
+        <span class="stat-label">축제 횟수</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" data-target="312">0</span>
+        <span class="stat-label">공연팀</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" data-target="15000">0</span>
+        <span class="stat-label">누적 방문객</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" data-target="847">0</span>
+        <span class="stat-label">등록된 추억</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- TIMELINE -->
+  <section class="timeline-section" id="timeline">
+    <div class="section-header">
+      <p class="section-label">HISTORY</p>
+      <h2>축제의 역사</h2>
+      <p class="section-desc">한성대학교 대동제의 발자취를 시각화로 만나보세요</p>
+    </div>
+
+    <div class="timeline-filter">
+      <button class="filter-btn active" data-decade="all">전체</button>
+      <button class="filter-btn" data-decade="2000">2000년대</button>
+      <button class="filter-btn" data-decade="2010">2010년대</button>
+      <button class="filter-btn" data-decade="2020">2020년대</button>
+    </div>
+
+    <div class="timeline" id="timelineContainer">
+      <!-- JS로 렌더링 -->
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section class="gallery-section" id="gallery">
+    <div class="section-header">
+      <p class="section-label">GALLERY</p>
+      <h2>축제의 순간들</h2>
+    </div>
+    <div class="gallery-grid" id="galleryGrid">
+      <!-- 2025 대동제 전경 — 한성디지털사진아카이브 -->
+      <div class="gallery-item large">
+        <img src="https://archives.hansung.ac.kr/files/large/1e5749f3a1edd77a3c992bb51224183f642e8170.jpg"
+             alt="2025년 대동제 축제 전경" loading="lazy" />
+        <div class="gallery-overlay">
+          <span class="gallery-year">2025</span>
+          <p>대동제 잔디광장 전경</p>
+        </div>
+      </div>
+      <!-- 2024 단체사진 — 한성디지털사진아카이브 -->
+      <div class="gallery-item">
+        <img src="https://archives.hansung.ac.kr/files/large/19a28da1b5074132d4c120db8a8dddc1efeb5ebe.jpg"
+             alt="2024년 대동제 학생 단체사진" loading="lazy" />
+        <div class="gallery-overlay">
+          <span class="gallery-year">2024</span>
+          <p>대동제 학생·교직원 단체</p>
+        </div>
+      </div>
+      <!-- 2024 행사 — 한성디지털사진아카이브 -->
+      <div class="gallery-item">
+        <img src="https://archives.hansung.ac.kr/files/large/00a91662de66af8bd071335f8cf0329164449ad3.jpg"
+             alt="2024년 대동제 행사 진행 모습" loading="lazy" />
+        <div class="gallery-overlay">
+          <span class="gallery-year">2024</span>
+          <p>대동제 행사 진행</p>
+        </div>
+      </div>
+      <!-- 2023 부스 — 한성디지털사진아카이브 (tall) -->
+      <div class="gallery-item tall">
+        <img src="https://archives.hansung.ac.kr/files/large/850d2d9aac7898b6874e35bf56017f8e6503db7c.jpg"
+             alt="2023년 대동제 공연 무대 및 부스" loading="lazy" />
+        <div class="gallery-overlay">
+          <span class="gallery-year">2023</span>
+          <p>공연 무대 · 부스 전경</p>
+        </div>
+      </div>
+      <!-- 2022 개교 50주년 — 한성디지털사진아카이브 -->
+      <div class="gallery-item">
+        <img src="https://archives.hansung.ac.kr/files/large/2e73826ba9b9cfe2529ab05d94bac0ef950a2c2b.jpg"
+             alt="2022년 개교 50주년 대동제" loading="lazy" />
+        <div class="gallery-overlay">
+          <span class="gallery-year">2022</span>
+          <p>개교 50주년 기념 대동제</p>
+        </div>
+      </div>
+      <!-- 2019 축제 거리 — CC BY 2.0 KR (한성대 성곽마을 아카이빙) -->
+      <div class="gallery-item">
+        <img src="https://previous.hsarchives.org/archive/files/original/2fc569e0d555052a5688f985b9d02045.jpg"
+             alt="2019년 대동제 축제 거리 모습" loading="lazy" />
+        <div class="gallery-overlay">
+          <span class="gallery-year">2019</span>
+          <p>대동제 축제 거리</p>
+        </div>
+      </div>
+    </div>
+    <p class="gallery-credit">
+      이미지 출처: <a href="https://archives.hansung.ac.kr" target="_blank" rel="noopener">한성디지털사진아카이브</a> /
+      <a href="https://previous.hsarchives.org" target="_blank" rel="noopener">한성대 성곽마을 아카이빙 프로젝트 (CC BY 2.0 KR)</a>
+    </p>
+  </section>
+
+  <!-- MEMORY -->
+  <section class="memory-section" id="memory">
+    <div class="section-header">
+      <p class="section-label">PARTICIPATE</p>
+      <h2>추억 남기기</h2>
+      <p class="section-desc">당신의 축제 기억을 아카이브에 새겨보세요</p>
+    </div>
+
+    <div class="memory-container">
+      <form class="memory-form" id="memoryForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label>이름 (닉네임)</label>
+            <input type="text" id="memName" placeholder="예) 22학번 컴공이" maxlength="20" required />
+          </div>
+          <div class="form-group">
+            <label>축제 연도</label>
+            <select id="memYear">
+              <option value="2024">2024년</option>
+              <option value="2023">2023년</option>
+              <option value="2022">2022년</option>
+              <option value="2021">2021년</option>
+              <option value="2020">2020년</option>
+              <option value="2019">2019년</option>
+              <option value="이전">2019년 이전</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>한 줄 추억</label>
+          <textarea id="memText" placeholder="축제에서의 기억을 짧게 남겨보세요..." maxlength="100" required></textarea>
+          <span class="char-count"><span id="charCnt">0</span>/100</span>
+        </div>
+        <div class="form-group emoji-group">
+          <label>기분 태그</label>
+          <div class="emoji-picker">
+            <button type="button" class="emoji-btn active" data-emoji="🎉">🎉 신남</button>
+            <button type="button" class="emoji-btn" data-emoji="🎵">🎵 음악</button>
+            <button type="button" class="emoji-btn" data-emoji="🍻">🍻 친구</button>
+            <button type="button" class="emoji-btn" data-emoji="💕">💕 설렘</button>
+            <button type="button" class="emoji-btn" data-emoji="🌟">🌟 감동</button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">추억 등록하기</button>
+      </form>
+
+      <div class="memory-wall" id="memoryWall">
+        <h3>최근 추억들</h3>
+        <div class="memory-cards" id="memoryCards">
+          <!-- JS로 렌더링 -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ARCHIVE TABLE -->
+  <section class="archive-section" id="archive">
+    <div class="section-header">
+      <p class="section-label">ARCHIVE</p>
+      <h2>공연 아카이브</h2>
+      <p class="section-desc">역대 공연팀과 행사 정보를 검색해보세요</p>
+    </div>
+
+    <div class="archive-search">
+      <input type="search" id="archiveSearch" placeholder="공연팀, 행사명, 연도로 검색..." />
+    </div>
+
+    <div class="archive-table-wrap">
+      <table class="archive-table" id="archiveTable">
+        <thead>
+          <tr>
+            <th>연도</th>
+            <th>축제명</th>
+            <th>메인 공연</th>
+            <th>특이사항</th>
+            <th>규모</th>
+          </tr>
+        </thead>
+        <tbody id="archiveBody">
+          <!-- JS로 렌더링 -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <p class="logo">HSU FESTA</p>
+        <p>한성대학교 대동제 아카이브</p>
+        <p class="footer-sub">© 2026 Hansung University Festival Archive.<br>디지털 인문정보학 캡스톤디자인 프로젝트로 제작되었습니다.</p>
+      </div>
+      <div class="footer-links">
+        <h4>바로가기</h4>
+        <ul>
+          <li><a href="#timeline">축제 역사</a></li>
+          <li><a href="#gallery">갤러리</a></li>
+          <li><a href="#memory">추억 남기기</a></li>
+          <li><a href="#archive">공연 아카이브</a></li>
+        </ul>
+      </div>
+      <div class="footer-contact">
+        <h4>한성대학교</h4>
+        <p>서울특별시 성북구 삼선교로 16길 116</p>
+        <p>한성대학교 총학생회</p>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- Supabase JS SDK (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js"></script>
+</body>
+</html>
