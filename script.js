@@ -127,7 +127,7 @@ function initTimeline() {
 }
 
 // 더미 모드일 때 메모리 내 임시 저장소
-let localMemories = [...DUMMY_MEMORIES];
+let localMemories = [];
 
 // Supabase 연결 시 DB 조회, 미연결 시 빈 배열 반환
 async function fetchMemories() {
@@ -257,7 +257,6 @@ function renderArchive(data) {
       <td>${row.name}</td>
       <td>${row.performers}</td>
       <td>${row.note}</td>
-      <td>${sizeBadge(row.size)}</td>
     </tr>
   `).join('');
 }
