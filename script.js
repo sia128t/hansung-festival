@@ -1,8 +1,8 @@
 /* 한성대학교 축제 아카이브 */
 
 // Supabase 설정값 — README.md 참고 후 실제 값으로 교체
-const SUPABASE_URL  = 'YOUR_SUPABASE_URL';
-const SUPABASE_ANON = 'YOUR_SUPABASE_ANON_KEY';
+const SUPABASE_URL  = 'sb_publishable_VtfktHwjq6-lGWE354nhBA_DnAO1fGo';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6YnRmZ2thaGhueGtxcWFpa3lyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NDExNTMsImV4cCI6MjA4OTAxNzE1M30.tWm2rHGE8fe-CRGeHtSVxq32jm6MUF8FltwKGkOhjdA';
 
 // 키가 설정되지 않은 경우 더미 모드로 동작
 const SUPABASE_READY = !SUPABASE_URL.startsWith('YOUR_');
