@@ -422,6 +422,23 @@ function initParallax() {
   }, { passive: true });
 }
 
+// 유튜브 영상 클릭 시 인라인 재생 (썸네일 → iframe 교체)
+function initVideos() {
+  document.querySelectorAll('.video-card').forEach(card => {
+    const thumb = card.querySelector('.video-thumb');
+    const vid = card.dataset.vid;
+    thumb.addEventListener('click', () => {
+      if (thumb.querySelector('iframe')) return;
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube.com/embed/${vid}?autoplay=1&rel=0`;
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      iframe.allowFullscreen = true;
+      thumb.innerHTML = '';
+      thumb.appendChild(iframe);
+    });
+  });
+}
+
 // 페이지 로드 후 각 모듈 초기화 (갤러리 오버레이는 CSS 처리)
 document.addEventListener('DOMContentLoaded', () => {
   initNav();
@@ -429,6 +446,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initTimeline();
   initMemory();
   initArchive();
+  initVideos();
   initHeroCanvas();
   initParallax();
   setTimeout(initScrollReveal, 100);
