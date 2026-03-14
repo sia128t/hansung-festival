@@ -1,7 +1,7 @@
 /* 한성대학교 축제 아카이브 */
 
-// Supabase 설정값 — README.md 참고 후 실제 값으로 교체
-const SUPABASE_URL  = 'sb_publishable_VtfktHwjq6-lGWE354nhBA_DnAO1fGo';
+// Supabase 설정값
+const SUPABASE_URL  = 'https://ezbtfgkahhnxkqqaikyr.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6YnRmZ2thaGhueGtxcWFpa3lyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NDExNTMsImV4cCI6MjA4OTAxNzE1M30.tWm2rHGE8fe-CRGeHtSVxq32jm6MUF8FltwKGkOhjdA';
 
 // 유효한 Supabase URL(https://로 시작)일 때만 연결 모드로 동작
@@ -150,26 +150,29 @@ function initTimeline() {
 // 더미 모드일 때 메모리 내 임시 저장소
 let localMemories = [...DUMMY_MEMORIES];
 
-// Supabase 연결 시 DB 조회, 미연결 시 더미 데이터 반환
+// Supabase 연결 시 DB 조회, 미연결 시 빈 배열 반환
 async function fetchMemories() {
-  if (!SUPABASE_READY) return localMemories;
+  if (!SUPABASE_READY || !db) return [];
   const { data, error } = await db
     .from('memories')
     .select('*')
     .order('created_at', { ascending: false })
     .limit(50);
-  if (error) { console.error('추억 조회 실패:', error); return []; }
+  if (error) {
+    console.error('추억 조회 실패 (Supabase 오류):', error.message, error);
+    return null; // null = 오류 상태
+  }
   return data;
 }
 
-// Supabase 연결 시 DB에 저장, 미연결 시 localMemories 배열 앞에 추가
+// Supabase 연결 시 DB에 저장
 async function insertMemory(payload) {
-  if (!SUPABASE_READY) {
-    localMemories.unshift({ ...payload, created_at: new Date().toISOString() });
-    return;
-  }
+  if (!SUPABASE_READY || !db) throw new Error('Supabase 미연결 상태입니다.');
   const { error } = await db.from('memories').insert([payload]);
-  if (error) throw error;
+  if (error) {
+    console.error('추억 저장 실패 (Supabase 오류):', error.message, error);
+    throw error;
+  }
 }
 
 // 추억 객체를 카드 DOM으로 변환
@@ -194,6 +197,10 @@ function createMemoryCard(mem) {
 function renderMemories(list) {
   const wall = document.getElementById('memoryCards');
   wall.innerHTML = '';
+  if (list === null) {
+    wall.innerHTML = '<p style="color:#f87171;font-size:0.9rem;padding:16px 0">⚠️ 데이터를 불러오지 못했습니다. Supabase 설정을 확인해주세요. (브라우저 콘솔 F12에서 오류 내용 확인)</p>';
+    return;
+  }
   if (!list.length) {
     wall.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem;padding:16px 0">아직 등록된 추억이 없어요. 첫 추억을 남겨보세요!</p>';
     return;
