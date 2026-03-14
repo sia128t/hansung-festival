@@ -17,44 +17,23 @@ try {
 
 // 타임라인 정적 데이터
 const TIMELINE_DATA = [
-  { year: 1996, title: "제1회 대동제",          decade: 2000, desc: "한성대학교 대동제의 역사가 시작되었습니다. 소규모 교내 공연과 동아리 전시로 첫걸음을 내딛었습니다.",              tags: ["첫 회", "교내"] },
-  { year: 2005, title: "야외 무대 첫 도입",      decade: 2000, desc: "본격적인 야외 무대를 갖추고 외부 아티스트를 처음으로 초청하며 축제의 규모가 한층 커졌습니다.",                tags: ["야외무대", "아티스트초청"] },
-  { year: 2010, title: "참여형 프로그램 확대",   decade: 2010, desc: "야시장·플리마켓 등 학생이 직접 운영하는 참여형 부스가 대폭 늘어나며 축제가 더욱 풍성해졌습니다.",             tags: ["야시장", "플리마켓"] },
-  { year: 2014, title: "소셜미디어 축제",        decade: 2010, desc: "SNS 연계 이벤트와 실시간 투표를 도입하여 더 많은 학생이 축제에 참여할 수 있는 새로운 장을 열었습니다.",       tags: ["SNS", "실시간투표"] },
-  { year: 2018, title: "역대 최대 규모",         decade: 2010, desc: "3일간 진행된 역대 최대 규모의 축제로, 방문객이 약 5,000명에 달하며 한성대 축제 역사에 새 기록을 세웠습니다.", tags: ["5000명", "3일"] },
-  { year: 2020, title: "온라인 전환 (코로나19)", decade: 2020, desc: "전 세계적 팬데믹으로 인해 처음으로 완전 온라인 비대면 방식으로 축제를 진행했습니다.",                        tags: ["온라인", "코로나19"] },
-  { year: 2022, title: "하이브리드 축제",        decade: 2020, desc: "온·오프라인을 결합한 하이브리드 방식으로 축제가 돌아왔으며, 라이브 스트리밍을 통해 더 많은 이들과 함께했습니다.", tags: ["하이브리드", "라이브스트리밍"] },
-  { year: 2023, title: "아카이브 프로젝트 시작", decade: 2020, desc: "학생 주도로 디지털 아카이브 프로젝트가 시작되어, 과거의 소중한 축제 기록들이 디지털로 보존되기 시작했습니다.",  tags: ["아카이브", "디지털화"] },
-  { year: 2024, title: "대동제 리뉴얼",          decade: 2020, desc: "참여형 디지털 아카이브가 본격적으로 운영되며, 누구나 자신의 추억을 남기고 공유할 수 있는 플랫폼이 열렸습니다.", tags: ["리뉴얼", "참여형", "플랫폼"] },
+  { year: 2000, title: "축제", decade: 2000, desc: "기사 내용 인용.", tags: ["해시", "태그"] },
+  { year: 2001, title: "축제", decade: 2000, desc: "기사 내용 인용.", tags: ["해시", "태그"] },
+  { year: 2010, title: "축제", decade: 2010, desc: "기사 내용 인용.", tags: ["해시", "태그"] },
+  { year: 2011, title: "축제", decade: 2010, desc: "기사 내용 인용.", tags: ["해시", "태그"] },
+  { year: 2012, title: "축제", decade: 2010, desc: "기사 내용 인용.", tags: ["해시", "태그"] },
+  { year: 2020, title: "축제", decade: 2020, desc: "기사 내용 인용.", tags: ["해시", "태그"] },
+  { year: 2021, title: "축제", decade: 2020, desc: "기사 내용 인용.", tags: ["해시", "태그"] },
+  { year: 2022, title: "축제", decade: 2020, desc: "기사 내용 인용.", tags: ["해시", "태그"] },
+  { year: 2023, title: "축제", decade: 2020, desc: "기사 내용 인용.", tags: ["해시", "태그"] },
 ];
 
 // 공연 아카이브 정적 데이터
 const ARCHIVE_DATA = [
-  { year: 2024, name: "봄 대동제 2024",   performers: "아이유, 세이수미, 잔나비",   note: "아카이브 웹사이트가 처음으로 공개되었습니다.",          size: "대형" },
-  { year: 2023, name: "봄 대동제 2023",   performers: "DAY6, 선우정아",            note: "코로나 이후 완전한 대면 축제로 돌아왔습니다.",          size: "대형" },
-  { year: 2022, name: "하이브리드 대동제", performers: "온라인 스트리밍 아티스트",   note: "온·오프라인을 병행하여 더 많은 학생이 참여했습니다.",    size: "중형" },
-  { year: 2021, name: "랜선 대동제",      performers: "유튜브 라이브 공연팀",       note: "100% 온라인으로 진행된 비대면 축제였습니다.",           size: "소형" },
-  { year: 2020, name: "온라인 대동제",    performers: "비대면 공연팀 다수",         note: "코로나19로 인해 처음으로 온라인 전환이 이루어졌습니다.", size: "소형" },
-  { year: 2019, name: "봄 대동제 2019",   performers: "10cm, 오반, 버스커버스커",   note: "역대 가장 큰 호응을 이끌어낸 축제였습니다.",            size: "대형" },
-  { year: 2018, name: "제22회 대동제",    performers: "크러쉬, 멜로망스",           note: "역대 최다 방문객을 기록하며 새 역사를 썼습니다.",        size: "대형" },
-  { year: 2017, name: "제21회 대동제",    performers: "볼빨간사춘기, 에디킴",       note: "-",                                                    size: "중형" },
-  { year: 2016, name: "제20회 대동제",    performers: "헤이즈, 오혁",              note: "개교 20주년을 기념하는 특별 공연이 펼쳐졌습니다.",        size: "중형" },
-  { year: 2015, name: "제19회 대동제",    performers: "루시드폴, 백아연",           note: "-",                                                    size: "중형" },
-];
-
-// 더미 추억 데이터 (Supabase 미연결 시 표시)
-const DAY = 1000 * 60 * 60 * 24;
-const DUMMY_MEMORIES = [
-  { name: "22학번 컴퓨터공학부",     year: "2024", emoji: "🎉", text: "잔나비 공연에서 밤새 같이 소리질렀던 친구들, 어디있어요?",           created_at: new Date(Date.now() - DAY *  2).toISOString() },
-  { name: "24학번 글로벌패션산업학부", year: "2024", emoji: "💕", text: "입학하자마자 대동제 참여! 선배들이랑 어울려서 너무 재밌었어요 🥹",    created_at: new Date(Date.now() - DAY *  5).toISOString() },
-  { name: "23학번 패션디자인학부",    year: "2024", emoji: "🌟", text: "처음 온 대동제인데 부스 구경만 세 바퀴 돌았어요. 내년에 또 오고 싶다!", created_at: new Date(Date.now() - DAY *  9).toISOString() },
-  { name: "19학번 경영학부",         year: "2023", emoji: "🌟", text: "코로나 끝나고 처음 온 대동제... 진짜 너무 감동이었다.",               created_at: new Date(Date.now() - DAY * 14).toISOString() },
-  { name: "21학번 미디어디자인학부",  year: "2022", emoji: "🎉", text: "하이브리드라 어색했지만 오프라인으로 친구들 만나서 너무 좋았다 ㅠㅠ",   created_at: new Date(Date.now() - DAY * 21).toISOString() },
-  { name: "20학번 역사문화학부",      year: "2020", emoji: "🎵", text: "온라인 대동제였지만... 방구석에서 혼자 응원봉 흔들었다.",              created_at: new Date(Date.now() - DAY * 30).toISOString() },
-  { name: "익명의 선배",             year: "2019", emoji: "🍻", text: "2019년 10cm 공연, 그날 비가 왔는데 아무도 자리를 안 떠났잖아요ㅜㅜ",   created_at: new Date(Date.now() - DAY * 45).toISOString() },
-  { name: "18학번 사회과학부",        year: "2019", emoji: "🍻", text: "버스커버스커 공연 때 비 맞으면서 떼창했던 거 아직도 생생해.",           created_at: new Date(Date.now() - DAY * 60).toISOString() },
-  { name: "17학번 산업디자인학부",    year: "2018", emoji: "💕", text: "축제 야시장에서 만난 사람이랑 지금 결혼했어요 😊",                    created_at: new Date(Date.now() - DAY * 80).toISOString() },
-  { name: "16학번 디지털인문정보학부", year: "2018", emoji: "🎵", text: "크러쉬 공연 보고 음악의 길로 입문했습니다... 지금도 후회 없어요.",     created_at: new Date(Date.now() - DAY * 102).toISOString() },
+  { year: 2026, name: "대동제 2026",   performers: "연예인1, 연예인, 연예인",   note: "특징1."},
+  { year: 2025, name: "대동제 2025",   performers: "연예인2, 연예인, 연예인",   note: "특징2."},
+  { year: 2024, name: "대동제 2024",   performers: "연예인3, 연예인, 연예인",   note: "특징3."},
+  { year: 2023, name: "대동제 2023",   performers: "연예인4, 연예인, 연예인",   note: "특징."},
 ];
 
 // XSS 방지용 HTML 이스케이프
