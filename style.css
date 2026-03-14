@@ -861,6 +861,61 @@ section {
 .badge-pink { background: rgba(236,72,153,0.2); color: #f472b6; }
 .badge-green { background: rgba(16,185,129,0.2); color: #34d399; }
 
+/* ===== TIMELINE NOTICE ===== */
+.timeline-notice {
+  max-width: 860px;
+  margin: 0 auto 36px;
+  padding: 20px 28px;
+  background: var(--card);
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.tl-notice-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.tl-notice-text {
+  flex: 1;
+  min-width: 180px;
+}
+
+.tl-notice-text strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.tl-notice-text p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.tl-notice-btn {
+  display: inline-block;
+  padding: 10px 20px;
+  background: rgba(245,158,11,0.15);
+  border: 1px solid rgba(245,158,11,0.5);
+  color: var(--accent);
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: var(--transition);
+}
+
+.tl-notice-btn:hover {
+  background: rgba(245,158,11,0.3);
+  color: #fcd34d;
+}
+
 /* ===== FOOTER ===== */
 .footer {
   background: var(--bg);
@@ -925,6 +980,24 @@ section {
   font-size: 0.85rem;
   margin-bottom: 6px;
   line-height: 1.7;
+}
+
+.footer-univ-btn {
+  display: inline-block;
+  padding: 8px 20px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+  margin-bottom: 14px;
+  transition: var(--transition);
+}
+
+.footer-univ-btn:hover {
+  background: var(--primary-dark);
+  color: #fff;
 }
 
 /* ===== TOAST ===== */

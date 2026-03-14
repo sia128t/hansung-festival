@@ -4,11 +4,16 @@
 const SUPABASE_URL  = 'sb_publishable_VtfktHwjq6-lGWE354nhBA_DnAO1fGo';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6YnRmZ2thaGhueGtxcWFpa3lyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NDExNTMsImV4cCI6MjA4OTAxNzE1M30.tWm2rHGE8fe-CRGeHtSVxq32jm6MUF8FltwKGkOhjdA';
 
-// 키가 설정되지 않은 경우 더미 모드로 동작
-const SUPABASE_READY = !SUPABASE_URL.startsWith('YOUR_');
+// 유효한 Supabase URL(https://로 시작)일 때만 연결 모드로 동작
+const SUPABASE_READY = SUPABASE_URL.startsWith('https://');
 
-// 키가 있을 때만 클라이언트 초기화
-const db = SUPABASE_READY ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON) : null;
+// 유효한 URL일 때만 클라이언트 초기화 (오류 방지를 위해 try-catch 적용)
+let db = null;
+try {
+  if (SUPABASE_READY) db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+} catch (e) {
+  console.error('Supabase 초기화 실패:', e);
+}
 
 // 타임라인 정적 데이터
 const TIMELINE_DATA = [
