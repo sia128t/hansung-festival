@@ -3,6 +3,7 @@
 한성대학교 대동제의 역사를 디지털로 기록하고, 재학생·졸업생 누구나 자신의 추억을 남길 수 있는 참여형 아카이브 웹사이트입니다.
 
 **배포 주소:** https://hansung-festival.vercel.app
+
 **공식 유튜브:** https://www.youtube.com/user/HansungUvi
 
 ---
