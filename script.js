@@ -7,6 +7,10 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 // 유효한 Supabase URL(https://로 시작)일 때만 연결 모드로 동작
 const SUPABASE_READY = SUPABASE_URL.startsWith('https://');
 
+// TimelineJS 임베드 URL: 이 값만 바꾸면 타임라인 내용이 교체됩니다.
+const TIMELINE_EMBED_URL = 'https://cdn.knightlab.com/libs/timeline3/latest/embed/index.html?source=v2%3A2PACX-1vSgxNocGPPR4-FJAuYL18lWh49O9oCSr6jn4WjSvx9W_Z4e74eEvZX2VEV0Y3gI1x3MbkNytZd9WUd-&font=Default&lang=en&initial_zoom=2&width=100%25&height=650';
+const TIMELINE_EMBED_HEIGHT = 650;
+
 // 유효한 URL일 때만 클라이언트 초기화 (오류 방지를 위해 try-catch 적용)
 let db = null;
 try {
@@ -14,19 +18,6 @@ try {
 } catch (e) {
   console.error('Supabase 초기화 실패:', e);
 }
-
-// 타임라인 정적 데이터
-const TIMELINE_DATA = [
-  { year: 2000, title: "축제", decade: 2000, desc: "기사 내용 인용.", tags: ["해시", "태그"] },
-  { year: 2001, title: "축제", decade: 2000, desc: "기사 내용 인용.", tags: ["해시", "태그"] },
-  { year: 2010, title: "축제", decade: 2010, desc: "기사 내용 인용.", tags: ["해시", "태그"] },
-  { year: 2011, title: "축제", decade: 2010, desc: "기사 내용 인용.", tags: ["해시", "태그"] },
-  { year: 2012, title: "축제", decade: 2010, desc: "기사 내용 인용.", tags: ["해시", "태그"] },
-  { year: 2020, title: "축제", decade: 2020, desc: "기사 내용 인용.", tags: ["해시", "태그"] },
-  { year: 2021, title: "축제", decade: 2020, desc: "기사 내용 인용.", tags: ["해시", "태그"] },
-  { year: 2022, title: "축제", decade: 2020, desc: "기사 내용 인용.", tags: ["해시", "태그"] },
-  { year: 2023, title: "축제", decade: 2020, desc: "기사 내용 인용.", tags: ["해시", "태그"] },
-];
 
 // 공연 아카이브 정적 데이터
 const ARCHIVE_DATA = [
@@ -85,45 +76,12 @@ function initStats() {
   if (statsEl) observer.observe(statsEl);
 }
 
-// 타임라인 카드를 홀짝에 따라 좌우 교차 배치로 렌더링
-function renderTimeline(decade) {
-  const container = document.getElementById('timelineContainer');
-  const filtered = decade === 'all'
-    ? TIMELINE_DATA
-    : TIMELINE_DATA.filter(d => d.decade === parseInt(decade));
-
-  container.innerHTML = filtered.map((item, i) => {
-    // 홀수 인덱스: 왼쪽 카드 / 짝수: 오른쪽 카드
-    const card = `
-      <span class="tl-year">${item.year}</span>
-      <p class="tl-title">${item.title}</p>
-      <p class="tl-desc">${item.desc}</p>
-      ${item.tags.map(t => `<span class="tl-tag">${t}</span>`).join('')}
-    `;
-    return `
-      <div class="timeline-item" style="animation-delay:${i * 0.08}s">
-        ${i % 2 === 0
-          ? `<div class="tl-content">${card}</div>
-             <div class="tl-dot-col"><div class="tl-dot"></div></div>
-             <div class="tl-spacer"></div>`
-          : `<div class="tl-spacer"></div>
-             <div class="tl-dot-col"><div class="tl-dot"></div></div>
-             <div class="tl-content">${card}</div>`
-        }
-      </div>`;
-  }).join('');
-}
-
-// 타임라인 초기화 및 10년대 필터 버튼 이벤트 등록
 function initTimeline() {
-  renderTimeline('all');
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderTimeline(btn.dataset.decade);
-    });
-  });
+  const iframe = document.getElementById('timelineEmbed');
+  if (!iframe) return;
+
+  iframe.src = TIMELINE_EMBED_URL;
+  iframe.style.height = `${TIMELINE_EMBED_HEIGHT}px`;
 }
 
 // 더미 모드일 때 메모리 내 임시 저장소
@@ -300,7 +258,7 @@ function initScrollReveal() {
     });
   }, { threshold: 0.08 });
 
-  document.querySelectorAll('.stat-item, .gallery-item, .archive-table tbody tr').forEach(el => {
+  document.querySelectorAll('.stat-item, .timeline-container, .archive-table tbody tr').forEach(el => {
     el.style.opacity = '0';
     el.style.transform = 'translateY(20px)';
     el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';

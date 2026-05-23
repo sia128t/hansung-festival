@@ -16,7 +16,6 @@
       <a class="logo" href="#">HSU FESTA</a>
       <ul class="nav-links">
         <li><a href="#timeline">역사</a></li>
-        <li><a href="#gallery">갤러리</a></li>
         <li><a href="#memory">추억 남기기</a></li>
         <li><a href="#videos">영상</a></li>
         <li><a href="#archive">아카이브</a></li>
@@ -25,7 +24,6 @@
     </div>
     <ul class="mobile-menu" id="mobileMenu">
       <li><a href="#timeline">역사</a></li>
-      <li><a href="#gallery">갤러리</a></li>
       <li><a href="#memory">추억 남기기</a></li>
       <li><a href="#videos">영상</a></li>
       <li><a href="#archive">아카이브</a></li>
@@ -57,101 +55,16 @@
 
   <!-- TIMELINE -->
   <section class="timeline-section" id="timeline">
-    <div class="section-header">
-      <p class="section-label">HISTORY</p>
-      <h2>축제의 역사</h2>
-      <p class="section-desc">한성대학교 대동제의 발자취를 만나보세요</p>
+    <div class="timeline-container" id="timelineContainer">
+      <p class="timeline-kicker">HSU FESTA TIMELINE</p>
+      <iframe
+        class="timeline-embed-frame"
+        id="timelineEmbed"
+        title="HSU Festa Timeline"
+        loading="lazy"
+        allowfullscreen
+      ></iframe>
     </div>
-
-    <div class="timeline-notice">
-      <span class="tl-notice-icon">📜</span>
-      <div class="tl-notice-text">
-        <strong>1999년 까지의 대동제 역사가 궁금하신가요?</strong>
-        <p>더 오래된 역사 기록은 아래 외부 타임라인에서 확인하실 수 있습니다.</p>
-      </div>
-      <a href="https://www.chronoflotimeline.com/timeline/shared/8743/-/" target="_blank" rel="noopener" class="tl-notice-btn">
-        전체 역사 타임라인 보기 →
-      </a>
-    </div>
-
-    <div class="timeline-filter">
-      <button class="filter-btn active" data-decade="all">전체</button>
-      <button class="filter-btn" data-decade="2000">2000년대</button>
-      <button class="filter-btn" data-decade="2010">2010년대</button>
-      <button class="filter-btn" data-decade="2020">2020년대</button>
-    </div>
-
-    <div class="timeline" id="timelineContainer">
-      <!-- JS로 렌더링 -->
-    </div>
-  </section>
-
-  <!-- GALLERY -->
-  <section class="gallery-section" id="gallery">
-    <div class="section-header">
-      <p class="section-label">GALLERY</p>
-      <h2>축제의 순간들</h2>
-    </div>
-    <div class="gallery-grid" id="galleryGrid">
-      <!-- 2025 대동제 전경 — 한성디지털사진아카이브 -->
-      <div class="gallery-item large">
-        <img src="https://archives.hansung.ac.kr/files/large/1e5749f3a1edd77a3c992bb51224183f642e8170.jpg"
-             alt="2025년 대동제 축제 전경" loading="lazy" />
-        <div class="gallery-overlay">
-          <span class="gallery-year">2025</span>
-          <p>대동제 잔디광장 전경</p>
-        </div>
-      </div>
-      <!-- 2024 단체사진 — 한성디지털사진아카이브 -->
-      <div class="gallery-item">
-        <img src="https://archives.hansung.ac.kr/files/large/19a28da1b5074132d4c120db8a8dddc1efeb5ebe.jpg"
-             alt="2024년 대동제 학생 단체사진" loading="lazy" />
-        <div class="gallery-overlay">
-          <span class="gallery-year">2024</span>
-          <p>대동제 학생·교직원 단체</p>
-        </div>
-      </div>
-      <!-- 2024 행사 — 한성디지털사진아카이브 -->
-      <div class="gallery-item">
-        <img src="https://archives.hansung.ac.kr/files/large/00a91662de66af8bd071335f8cf0329164449ad3.jpg"
-             alt="2024년 대동제 행사 진행 모습" loading="lazy" />
-        <div class="gallery-overlay">
-          <span class="gallery-year">2024</span>
-          <p>대동제 행사 진행</p>
-        </div>
-      </div>
-      <!-- 2023 부스 — 한성디지털사진아카이브 (tall) -->
-      <div class="gallery-item tall">
-        <img src="https://archives.hansung.ac.kr/files/large/850d2d9aac7898b6874e35bf56017f8e6503db7c.jpg"
-             alt="2023년 대동제 공연 무대 및 부스" loading="lazy" />
-        <div class="gallery-overlay">
-          <span class="gallery-year">2023</span>
-          <p>공연 무대 · 부스 전경</p>
-        </div>
-      </div>
-      <!-- 2022 개교 50주년 — 한성디지털사진아카이브 -->
-      <div class="gallery-item">
-        <img src="https://archives.hansung.ac.kr/files/large/2e73826ba9b9cfe2529ab05d94bac0ef950a2c2b.jpg"
-             alt="2022년 개교 50주년 대동제" loading="lazy" />
-        <div class="gallery-overlay">
-          <span class="gallery-year">2022</span>
-          <p>개교 50주년 기념 대동제</p>
-        </div>
-      </div>
-      <!-- 2019 축제 거리 — CC BY 2.0 KR (한성대 성곽마을 아카이빙) -->
-      <div class="gallery-item">
-        <img src="https://previous.hsarchives.org/archive/files/original/2fc569e0d555052a5688f985b9d02045.jpg"
-             alt="2019년 대동제 축제 거리 모습" loading="lazy" />
-        <div class="gallery-overlay">
-          <span class="gallery-year">2019</span>
-          <p>대동제 축제 거리</p>
-        </div>
-      </div>
-    </div>
-    <p class="gallery-credit">
-      이미지 출처: <a href="https://archives.hansung.ac.kr" target="_blank" rel="noopener">한성디지털사진아카이브</a> /
-      <a href="https://previous.hsarchives.org" target="_blank" rel="noopener">한성대 성곽마을 아카이빙 프로젝트 (CC BY 2.0 KR)</a>
-    </p>
   </section>
 
   <!-- MEMORY -->
@@ -373,8 +286,8 @@
         <h4>바로가기</h4>
         <ul>
           <li><a href="#timeline">축제 역사</a></li>
-          <li><a href="#gallery">갤러리</a></li>
           <li><a href="#memory">추억 남기기</a></li>
+          <li><a href="#videos">영상</a></li>
           <li><a href="#archive">공연 아카이브</a></li>
           <li><a href="#contact">문의하기</a></li>
         </ul>
