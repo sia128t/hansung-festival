@@ -15,8 +15,7 @@
 | 섹션 | 설명 |
 |---|---|
 | Hero (메인 화면) | 사이트 타이틀과 주요 버튼, 파티클 애니메이션 |
-| 역사 (Timeline) | 1996년 1회 대동제부터 현재까지의 연도별 역사 카드 |
-| 갤러리 (Gallery) | 역대 대동제 공식 사진 그리드 |
+| 역사 (Timeline) | TimelineJS/CSV/JSON 데이터를 자체 전시형 UI로 렌더링하는 몰입형 타임라인 |
 | 추억 남기기 (Memory) | 누구나 자신의 축제 기억을 직접 등록하고 공유 |
 | 영상 (Videos) | 한성대 공식 유튜브 영상 인라인 재생 |
 | 공연 아카이브 (Archive) | 연도별 공연팀·행사 정보 테이블 및 검색 |
@@ -32,13 +31,10 @@
 - 모바일에서는 오른쪽 상단 햄버거 메뉴(☰)로 내비게이션 열기
 
 #### 역사 — 축제 타임라인
-- **전체 / 2000년대 / 2010년대 / 2020년대** 버튼으로 연도대 필터
-- 카드에는 연도, 축제명, 설명, 태그가 표시됨
-- 1990년대 이전 기록은 배너의 **전체 역사 타임라인 보기** 링크 클릭
-
-#### 갤러리 — 축제 사진
-- 이미지에 마우스를 올리면 연도와 설명 오버레이 표시
-- 이미지 출처: 한성디지털사진아카이브 / 한성대 성곽마을 아카이빙 프로젝트
+- `script.js`의 `TIMELINE_SOURCE_URL` 또는 `?timeline=...` URL 파라미터를 데이터 소스로 사용
+- TimelineJS embed URL, Google Sheets CSV URL, JSON URL을 자동 파싱해 자체 전시형 UI로 렌더링
+- 슬라이드, 배경, 하단 연도 축, 이전/다음 버튼, 진행 바가 데이터 개수에 맞춰 자동 생성됨
+- 키보드 방향키, 마우스 휠/트랙패드, 모바일 스와이프 이동 지원
 
 #### 추억 남기기 — 참여 기능
 1. 이름(닉네임), 축제 연도 입력
@@ -85,13 +81,13 @@ SUPABASE_URL이 'https://'로 시작하면 DB 모드
 ```
 `SUPABASE_READY` 플래그 하나로 DB 모드·더미 모드를 전환합니다.
 
-#### 2. 타임라인 렌더링 (renderTimeline)
+#### 2. 데이터 기반 타임라인 엔진 (initTimeline)
 ```
-TIMELINE_DATA 배열
-└─ decade 필터 적용 (전체 / 2000 / 2010 / 2020)
-   └─ 인덱스 짝수: 카드를 왼쪽에 배치
-      인덱스 홀수: 카드를 오른쪽에 배치
-      (CSS grid 3열: 카드 | 점 | 빈칸 또는 빈칸 | 점 | 카드)
+TIMELINE_SOURCE_URL 또는 ?timeline=...
+└─ TimelineJS embed URL이면 source 파라미터 추출
+   └─ source=v2:2PACX... 값을 Google Sheets CSV URL로 변환
+      └─ CSV/JSON 로드 → normalizeTimelineItems()
+         └─ slides, backgrounds, media, year markers, progress 자동 생성
 ```
 
 #### 3. 추억 저장 흐름 (initMemory → insertMemory)
@@ -141,7 +137,7 @@ scroll 이벤트
 #### 8. 스크롤 페이드인 (initScrollReveal)
 ```
 IntersectionObserver (threshold: 0.08)
-└─ .stat-item, .gallery-item, .archive-table tbody tr 대상
+└─ .stat-item, .immersive-timeline, .archive-table tbody tr 대상
    └─ 뷰포트 진입 시 opacity: 0→1, translateY: 20px→0
       (DOMContentLoaded 후 100ms 딜레이로 실행 — 초기 레이아웃 계산 완료 대기)
 ```
@@ -152,12 +148,105 @@ IntersectionObserver (threshold: 0.08)
 
 | 수정 항목 | 파일 | 위치 |
 |---|---|---|
-| 타임라인 내용 | `script.js` | `TIMELINE_DATA` 배열 |
+| 타임라인 기본 데이터 URL | `script.js` | `TIMELINE_SOURCE_URL` |
+| 타임라인 예비 데이터 | `script.js` | `TIMELINE_FALLBACK_ITEMS` |
+| 타임라인 디자인 | `style.css` | `/* ===== TIMELINE ===== */` |
 | 공연 아카이브 | `script.js` | `ARCHIVE_DATA` 배열 |
-| 더미 추억 데이터 | `script.js` | `DUMMY_MEMORIES` 배열 |
-| 갤러리 이미지·설명 | `index.html` | `<!-- GALLERY -->` 섹션 |
+| 임시 추억 데이터 | `script.js` | `localMemories` 배열 |
 | 통계 숫자 | `index.html` | `data-target` 속성 값 |
 | 영상 유튜브 ID | `index.html` | `<!-- VIDEOS -->` 섹션 |
+
+---
+
+## TimelineJS / JSON 타임라인 링크 교체 방법
+
+현재 타임라인은 HTML을 복붙하지 않고, 외부 데이터 URL을 읽어서 자체 전시형 UI를 자동 생성합니다. `script.js` 상단의 `TIMELINE_SOURCE_URL`만 바꾸거나, 주소창에 `?timeline=...` 파라미터를 넘기면 다른 타임라인 데이터를 같은 디자인으로 렌더링합니다.
+
+### 현재 설정 위치
+
+```js
+const TIMELINE_SOURCE_URL = 'https://cdn.knightlab.com/libs/timeline3/latest/embed/index.html?source=v2%3A2PACX-1vSgxNocGPPR4-FJAuYL18lWh49O9oCSr6jn4WjSvx9W_Z4e74eEvZX2VEV0Y3gI1x3MbkNytZd9WUd-&font=Default&lang=en&initial_zoom=2&width=100%25&height=650';
+```
+
+### 전체 링크를 교체하는 방법
+
+Knight Lab에서 새로 발급받은 embed 링크 전체를 `TIMELINE_SOURCE_URL` 문자열에 그대로 붙여 넣으면 됩니다.
+
+```js
+const TIMELINE_SOURCE_URL = '새 TimelineJS embed 링크 전체';
+```
+
+이 방식이 가장 안전합니다. URL 안의 `source` 값은 길고 인코딩되어 있어서 일부만 복사하면 타임라인이 로드되지 않을 수 있습니다. 내부적으로는 `source=v2:2PACX...` 값을 추출해 아래 형태의 Google Sheets CSV URL로 변환합니다.
+
+```text
+https://docs.google.com/spreadsheets/d/e/2PACX-.../pub?output=csv
+```
+
+### 코드 수정 없이 링크를 테스트하는 방법
+
+브라우저 주소 뒤에 `timeline` 파라미터를 붙이면 `TIMELINE_SOURCE_URL`보다 우선 적용됩니다. 전체 URL은 반드시 `encodeURIComponent` 방식으로 인코딩해야 `&font=...` 같은 파라미터가 잘리지 않습니다.
+
+```text
+index.html?timeline=https%3A%2F%2Fcdn.knightlab.com%2Flibs%2Ftimeline3%2Flatest%2Fembed%2Findex.html%3Fsource%3Dv2%253A2PACX-...%26font%3DDefault%26lang%3Dko%26initial_zoom%3D2%26width%3D100%2525%26height%3D650
+```
+
+운영 반영 전 새 타임라인 링크를 빠르게 확인할 때 이 방식을 쓰면 됩니다.
+
+### URL에서 특히 바꾸는 부분
+
+예시 URL:
+
+```text
+https://cdn.knightlab.com/libs/timeline3/latest/embed/index.html?source=v2%3A2PACX-...&font=Default&lang=en&initial_zoom=2&width=100%25&height=650
+```
+
+| 파라미터 | 역할 | 바꾸는 경우 |
+|---|---|---|
+| `source=...` | 실제 데이터 원본. 이 프로젝트에서 가장 중요하게 읽는 값 | 다른 스프레드시트/타임라인으로 바꿀 때 |
+| `font=Default` | TimelineJS 기본 iframe용 폰트 옵션 | 현재 자체 렌더링에서는 사용하지 않음 |
+| `lang=en` | TimelineJS 기본 iframe용 UI 언어 옵션 | 현재 자체 렌더링에서는 거의 영향 없음 |
+| `initial_zoom=2` | TimelineJS 기본 iframe용 초기 확대 옵션 | 현재 자체 렌더링에서는 사용하지 않음 |
+| `width=100%25` | TimelineJS 기본 iframe용 너비 옵션 | 현재 자체 렌더링에서는 사용하지 않음 |
+| `height=650` | TimelineJS 기본 iframe용 높이 옵션 | 현재 자체 렌더링에서는 사용하지 않음 |
+
+즉, 지금 구조에서 타임라인 내용을 바꾸는 핵심은 `source=...`입니다. 나머지 파라미터는 Knight Lab 원본 iframe에서는 의미가 있지만, 이 프로젝트의 커스텀 렌더러에서는 데이터 로딩에 직접 쓰지 않습니다.
+
+### JSON 데이터도 사용 가능
+
+`TIMELINE_SOURCE_URL`에는 JSON 파일 URL도 넣을 수 있습니다. 배열 또는 `{ "items": [...] }`, `{ "events": [...] }` 형태를 지원합니다.
+
+```json
+[
+  {
+    "year": "2024",
+    "title": "대동제 행사 진행",
+    "description": "현재 프로젝트의 타임라인 내용을 전시형 슬라이드로 표시",
+    "background": "https://example.com/background.jpg",
+    "thumbnail": "https://example.com/thumb.jpg",
+    "mood": "축제"
+  }
+]
+```
+
+지원 필드:
+
+| 필드 | 설명 |
+|---|---|
+| `title` 또는 `headline` | 슬라이드 제목 |
+| `year` 또는 `startYear` | 하단 축과 큰 연도 텍스트 |
+| `date` | 보조 날짜 텍스트 |
+| `description`, `desc`, `text` | 본문 설명 |
+| `background`, `backgroundImage` | 풀스크린 배경 이미지 |
+| `image`, `media` | 배경 대체 이미지 또는 보조 이미지 |
+| `thumbnail`, `thumb` | 오른쪽 보조 미디어 이미지 |
+| `mood`, `theme`, `group` | 감정/시대 분위기. 색상과 라벨에 반영 |
+
+### TimelineJS 원본 데이터 수정 흐름
+
+1. Google Sheets에서 TimelineJS 데이터 수정
+2. 시트를 웹에 게시 또는 기존 게시 상태 유지
+3. 같은 `source`를 쓰면 사이트는 새로고침 시 수정된 내용을 불러옴
+4. 다른 시트를 쓰려면 Knight Lab에서 새 embed URL을 만들고 `TIMELINE_SOURCE_URL` 전체를 교체
 
 ---
 

@@ -7,9 +7,48 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 // 유효한 Supabase URL(https://로 시작)일 때만 연결 모드로 동작
 const SUPABASE_READY = SUPABASE_URL.startsWith('https://');
 
-// TimelineJS 임베드 URL: 이 값만 바꾸면 타임라인 내용이 교체됩니다.
-const TIMELINE_EMBED_URL = 'https://cdn.knightlab.com/libs/timeline3/latest/embed/index.html?source=v2%3A2PACX-1vSgxNocGPPR4-FJAuYL18lWh49O9oCSr6jn4WjSvx9W_Z4e74eEvZX2VEV0Y3gI1x3MbkNytZd9WUd-&font=Default&lang=en&initial_zoom=2&width=100%25&height=650';
-const TIMELINE_EMBED_HEIGHT = 650;
+// TimelineJS embed URL, Google Sheets CSV URL, or JSON URL.
+// ?timeline=URL query parameter overrides this value without changing code.
+const TIMELINE_SOURCE_URL = 'https://cdn.knightlab.com/libs/timeline3/latest/embed/index.html?source=v2%3A2PACX-1vSgxNocGPPR4-FJAuYL18lWh49O9oCSr6jn4WjSvx9W_Z4e74eEvZX2VEV0Y3gI1x3MbkNytZd9WUd-&font=Default&lang=en&initial_zoom=2&width=100%25&height=650';
+
+const TIMELINE_FALLBACK_ITEMS = [
+  {
+    year: '2000',
+    title: '한성대학교 대동제',
+    date: 'Festival Archive',
+    description: '외부 타임라인 데이터를 불러오지 못했을 때 표시되는 기본 예비 장면입니다.',
+    background: 'https://archives.hansung.ac.kr/files/large/1e5749f3a1edd77a3c992bb51224183f642e8170.jpg',
+    thumbnail: 'https://archives.hansung.ac.kr/files/large/1e5749f3a1edd77a3c992bb51224183f642e8170.jpg',
+    mood: '기록'
+  },
+  {
+    year: '2022',
+    title: '개교 50주년 기념 대동제',
+    date: 'Festival Archive',
+    description: '한성대학교 축제의 변화와 기억을 전시형 타임라인으로 보여주는 예비 장면입니다.',
+    background: 'https://archives.hansung.ac.kr/files/large/2e73826ba9b9cfe2529ab05d94bac0ef950a2c2b.jpg',
+    thumbnail: 'https://archives.hansung.ac.kr/files/large/2e73826ba9b9cfe2529ab05d94bac0ef950a2c2b.jpg',
+    mood: '기념'
+  },
+  {
+    year: '2024',
+    title: '대동제 행사 진행',
+    date: 'Festival Archive',
+    description: '현재 프로젝트의 데이터 구조를 유지한 채 같은 시각 시스템으로 자동 렌더링됩니다.',
+    background: 'https://archives.hansung.ac.kr/files/large/00a91662de66af8bd071335f8cf0329164449ad3.jpg',
+    thumbnail: 'https://archives.hansung.ac.kr/files/large/00a91662de66af8bd071335f8cf0329164449ad3.jpg',
+    mood: '참여'
+  },
+  {
+    year: '2025',
+    title: '대동제 잔디광장 전경',
+    date: 'Festival Archive',
+    description: '타임라인 링크가 정상 연결되면 이 예비 데이터 대신 외부 원본 데이터가 표시됩니다.',
+    background: 'https://archives.hansung.ac.kr/files/large/1e5749f3a1edd77a3c992bb51224183f642e8170.jpg',
+    thumbnail: 'https://archives.hansung.ac.kr/files/large/1e5749f3a1edd77a3c992bb51224183f642e8170.jpg',
+    mood: '현재'
+  }
+];
 
 // 유효한 URL일 때만 클라이언트 초기화 (오류 방지를 위해 try-catch 적용)
 let db = null;
@@ -19,17 +58,9 @@ try {
   console.error('Supabase 초기화 실패:', e);
 }
 
-// 공연 아카이브 정적 데이터
-const ARCHIVE_DATA = [
-  { year: 2026, name: "대동제 2026",   performers: "연예인1, 연예인, 연예인",   note: "특징1."},
-  { year: 2025, name: "대동제 2025",   performers: "연예인2, 연예인, 연예인",   note: "특징2."},
-  { year: 2024, name: "대동제 2024",   performers: "연예인3, 연예인, 연예인",   note: "특징3."},
-  { year: 2023, name: "대동제 2023",   performers: "연예인4, 연예인, 연예인",   note: "특징."},
-];
-
 // XSS 방지용 HTML 이스케이프
 function escapeHtml(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 // created_at 타임스탬프를 "N분 전" 형식으로 변환
@@ -76,12 +107,353 @@ function initStats() {
   if (statsEl) observer.observe(statsEl);
 }
 
-function initTimeline() {
-  const iframe = document.getElementById('timelineEmbed');
-  if (!iframe) return;
+function getTimelineSourceUrl() {
+  const paramUrl = new URLSearchParams(window.location.search).get('timeline');
+  if (!paramUrl) return TIMELINE_SOURCE_URL;
+  try {
+    return decodeURIComponent(paramUrl);
+  } catch (e) {
+    return paramUrl;
+  }
+}
 
-  iframe.src = TIMELINE_EMBED_URL;
-  iframe.style.height = `${TIMELINE_EMBED_HEIGHT}px`;
+function extractTimelineSource(url) {
+  try {
+    const parsed = new URL(url, window.location.href);
+    const source = parsed.searchParams.get('source');
+    return source || url;
+  } catch (e) {
+    return url;
+  }
+}
+
+function toGoogleCsvUrl(source) {
+  let decoded = source;
+  try {
+    decoded = decodeURIComponent(source);
+  } catch (e) {
+    decoded = source;
+  }
+  const pacxMatch = decoded.match(/(?:v2:)?(2PACX-[^&]+)/);
+  if (pacxMatch) {
+    return `https://docs.google.com/spreadsheets/d/e/${pacxMatch[1]}/pub?output=csv`;
+  }
+  if (decoded.includes('docs.google.com') && decoded.includes('/pubhtml')) {
+    const csvUrl = decoded.replace('/pubhtml', '/pub');
+    return `${csvUrl}${csvUrl.includes('?') ? '&' : '?'}output=csv`;
+  }
+  if (decoded.includes('docs.google.com') && !decoded.includes('output=csv')) {
+    return `${decoded}${decoded.includes('?') ? '&' : '?'}output=csv`;
+  }
+  return decoded;
+}
+
+function parseCsv(text) {
+  const rows = [];
+  let row = [];
+  let cell = '';
+  let quoted = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const next = text[i + 1];
+
+    if (char === '"' && quoted && next === '"') {
+      cell += '"';
+      i++;
+    } else if (char === '"') {
+      quoted = !quoted;
+    } else if (char === ',' && !quoted) {
+      row.push(cell);
+      cell = '';
+    } else if ((char === '\n' || char === '\r') && !quoted) {
+      if (char === '\r' && next === '\n') i++;
+      row.push(cell);
+      if (row.some(value => value.trim() !== '')) rows.push(row);
+      row = [];
+      cell = '';
+    } else {
+      cell += char;
+    }
+  }
+
+  row.push(cell);
+  if (row.some(value => value.trim() !== '')) rows.push(row);
+  return rows;
+}
+
+function normalizeKey(key) {
+  return key.toLowerCase().replace(/[^a-z0-9가-힣]/g, '');
+}
+
+function makeRowObject(headers, values) {
+  return headers.reduce((obj, header, index) => {
+    obj[normalizeKey(header)] = (values[index] || '').trim();
+    return obj;
+  }, {});
+}
+
+function readField(row, names) {
+  for (const name of names) {
+    const value = row[normalizeKey(name)];
+    if (value) return value;
+  }
+  return '';
+}
+
+function formatTimelineDate(row) {
+  const startYear = readField(row, ['year', 'startyear', '시작연도', '연도']);
+  const startMonth = readField(row, ['month', 'startmonth', '시작월']);
+  const startDay = readField(row, ['day', 'startday', '시작일']);
+  const endYear = readField(row, ['endyear', '종료연도']);
+  const endMonth = readField(row, ['endmonth', '종료월']);
+  const endDay = readField(row, ['endday', '종료일']);
+  const start = [startYear, startMonth, startDay].filter(Boolean).join('.');
+  const end = [endYear, endMonth, endDay].filter(Boolean).join('.');
+  return end ? `${start} — ${end}` : start;
+}
+
+function resolveImageUrl(url) {
+  if (!url) return '';
+  const trimmed = url.trim();
+  if (!/^https?:\/\//i.test(trimmed)) return '';
+  if (trimmed.includes('drive.google.com/drive/folders')) return '';
+  const driveMatch = trimmed.match(/(?:drive\.google\.com\/file\/d\/|id=)([-\w]{20,})/);
+  if (driveMatch) return `https://lh3.googleusercontent.com/d/${driveMatch[1]}`;
+  return trimmed;
+}
+
+function moodForIndex(index, total, title = '') {
+  const text = title.toLowerCase();
+  if (title.includes('개교') || title.includes('기념')) return '기념';
+  if (title.includes('온라인')) return '전환';
+  if (title.includes('Magic') || title.includes('DREAM')) return '확장';
+  if (text.includes('festival') || title.includes('대동제')) return '축제';
+  if (index < total * 0.34) return '탐색';
+  if (index < total * 0.68) return '실험';
+  return '철학';
+}
+
+function accentForMood(mood) {
+  const map = {
+    '탐색': '#b9a17b',
+    '방황': '#8ea0b8',
+    '전환': '#d7a86e',
+    '기록': '#b9a17b',
+    '기념': '#d7a86e',
+    '참여': '#c7a35a',
+    '현재': '#d8c7ad',
+    '축제': '#d7b98a',
+    '여행': '#b58b63',
+    '실험': '#bfc3c7',
+    '도전': '#c7a35a',
+    '확장': '#97b3d9',
+    '철학': '#d8c7ad',
+    '완성': '#ead8b5'
+  };
+  return map[mood] || '#d7b98a';
+}
+
+function normalizeTimelineItems(rawItems) {
+  const items = rawItems
+    .map((item, index, arr) => {
+      const row = Object.keys(item).reduce((obj, key) => {
+        obj[normalizeKey(key)] = String(item[key] || '').trim();
+        return obj;
+      }, {});
+      const startDate = item.start_date || item.startDate || {};
+      const mediaData = item.media || {};
+      const rawTitle = readField(row, ['headline', 'title', '제목']) || item.text?.headline || '';
+      const rawDescription = readField(row, ['text', 'description', 'desc', '설명', '내용']) || item.text?.text || item.text || '';
+      const description = typeof rawDescription === 'string' ? rawDescription : '';
+      const year = readField(row, ['year', 'startyear', '연도']) || startDate.year || String(index + 1);
+      const date = readField(row, ['date', '날짜']) || formatTimelineDate(row);
+      const backgroundSource = resolveImageUrl(readField(row, ['background', 'backgroundimage', '배경', '배경이미지']));
+      const mediaSource = resolveImageUrl(readField(row, ['media', 'image', '이미지'])) ||
+        resolveImageUrl(item.background?.url || item.background || mediaData.url);
+      if (!rawTitle && !description && !backgroundSource && !mediaSource) return null;
+      const title = rawTitle || String(year);
+      const background = backgroundSource ||
+        mediaSource ||
+        TIMELINE_FALLBACK_ITEMS[index % TIMELINE_FALLBACK_ITEMS.length].background;
+      const thumbnail = resolveImageUrl(readField(row, ['thumbnail', 'thumb', '썸네일'])) ||
+        mediaSource ||
+        resolveImageUrl(mediaData.thumbnail || mediaData.url);
+      const mood = readField(row, ['mood', 'theme', 'group', '분위기', '테마']) || moodForIndex(index, arr.length, title);
+
+      return {
+        title,
+        year,
+        date,
+        description,
+        background,
+        thumbnail,
+        mood,
+        accent: accentForMood(mood)
+      };
+    })
+    .filter(Boolean);
+
+  return items.length ? items : TIMELINE_FALLBACK_ITEMS;
+}
+
+async function loadTimelineItems(sourceUrl) {
+  const source = extractTimelineSource(sourceUrl);
+  const dataUrl = toGoogleCsvUrl(source);
+  const response = await fetch(dataUrl, { cache: 'no-store' });
+  if (!response.ok) throw new Error(`Timeline source request failed: ${response.status}`);
+  const text = await response.text();
+  const contentType = response.headers.get('content-type') || '';
+
+  if (contentType.includes('json') || dataUrl.endsWith('.json') || text.trim().startsWith('{') || text.trim().startsWith('[')) {
+    const json = JSON.parse(text);
+    const events = Array.isArray(json) ? json : (json.events || json.timeline || json.items || []);
+    return normalizeTimelineItems(events);
+  }
+
+  const rows = parseCsv(text);
+  const headers = rows.shift() || [];
+  return normalizeTimelineItems(rows.map(row => makeRowObject(headers, row)));
+}
+
+function createTimelineScene(item, index) {
+  return `
+    <article class="timeline-scene" data-index="${index}" style="--scene-accent:${item.accent}">
+      <div class="scene-bg" style="background-image:url('${item.background.replace(/'/g, '%27')}')"></div>
+      <div class="scene-gradient"></div>
+      <div class="scene-texture"></div>
+      <div class="scene-content">
+        <div class="scene-copy">
+          <p class="scene-mood">${escapeHtml(item.mood)}</p>
+          <span class="scene-year">${escapeHtml(String(item.year))}</span>
+          <h3 class="scene-title">${escapeHtml(item.title)}</h3>
+          <p class="scene-date">${escapeHtml(item.date || '')}</p>
+          <p class="scene-desc">${escapeHtml(item.description || '')}</p>
+        </div>
+        ${item.thumbnail ? `<figure class="scene-media"><img src="${item.thumbnail}" alt="${escapeHtml(item.title)}" loading="${index < 2 ? 'eager' : 'lazy'}"></figure>` : ''}
+      </div>
+    </article>`;
+}
+
+function createAxisMarker(item, index) {
+  return `
+    <button class="axis-marker" type="button" data-index="${index}" style="--scene-accent:${item.accent}" aria-label="${escapeHtml(item.year)} ${escapeHtml(item.title)}">
+      <span class="axis-year">${escapeHtml(String(item.year))}</span>
+      <span class="axis-title">${escapeHtml(item.title)}</span>
+    </button>`;
+}
+
+function preloadTimelineImages(items, currentIndex) {
+  [currentIndex, currentIndex + 1, currentIndex - 1].forEach(index => {
+    const item = items[index];
+    if (!item || !item.background) return;
+    const image = new Image();
+    image.src = item.background;
+  });
+}
+
+function mountTimeline(items) {
+  const app = document.getElementById('timelineApp');
+  const scenes = document.getElementById('timelineScenes');
+  const axis = document.getElementById('timelineAxis');
+  const prev = document.getElementById('timelinePrev');
+  const next = document.getElementById('timelineNext');
+  const progress = document.getElementById('timelineProgressBar');
+  const start = document.getElementById('timelineStartBtn');
+  const loading = document.getElementById('timelineLoading');
+  const heroBg = document.getElementById('timelineHeroBg');
+  if (!app || !scenes || !axis || !prev || !next || !progress) return;
+
+  let activeIndex = 0;
+  let wheelLock = false;
+  let touchStartX = 0;
+  let touchStartY = 0;
+
+  loading.hidden = true;
+  if (heroBg && items[0]?.background) {
+    heroBg.style.backgroundImage = `linear-gradient(115deg, rgba(0,0,0,0.45), rgba(0,0,0,0.05)), url('${items[0].background.replace(/'/g, '%27')}')`;
+  }
+  scenes.innerHTML = items.map(createTimelineScene).join('');
+  axis.innerHTML = items.map(createAxisMarker).join('');
+
+  const sceneEls = Array.from(scenes.querySelectorAll('.timeline-scene'));
+  const markerEls = Array.from(axis.querySelectorAll('.axis-marker'));
+  const setActive = (index) => {
+    activeIndex = Math.max(0, Math.min(items.length - 1, index));
+    sceneEls.forEach((scene, i) => {
+      scene.classList.toggle('is-active', i === activeIndex);
+      scene.classList.toggle('is-before', i < activeIndex);
+      scene.setAttribute('aria-hidden', i === activeIndex ? 'false' : 'true');
+    });
+    markerEls.forEach((marker, i) => {
+      marker.classList.toggle('is-active', i === activeIndex);
+      marker.setAttribute('aria-current', i === activeIndex ? 'step' : 'false');
+    });
+    prev.disabled = activeIndex === 0;
+    next.disabled = activeIndex === items.length - 1;
+    progress.style.width = `${items.length <= 1 ? 100 : (activeIndex / (items.length - 1)) * 100}%`;
+    markerEls[activeIndex]?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    preloadTimelineImages(items, activeIndex);
+  };
+
+  const move = (direction) => setActive(activeIndex + direction);
+  prev.addEventListener('click', () => move(-1));
+  next.addEventListener('click', () => move(1));
+  markerEls.forEach(marker => {
+    marker.addEventListener('click', () => setActive(Number(marker.dataset.index)));
+  });
+  start?.addEventListener('click', () => scenes.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+
+  app.addEventListener('wheel', (event) => {
+    const isInsideScenes = window.scrollY >= app.offsetTop + window.innerHeight * 0.4 &&
+      window.scrollY < app.offsetTop + app.offsetHeight - window.innerHeight * 0.2;
+    if (!isInsideScenes || Math.abs(event.deltaY) < 18 || wheelLock) return;
+    event.preventDefault();
+    wheelLock = true;
+    move(event.deltaY > 0 ? 1 : -1);
+    setTimeout(() => { wheelLock = false; }, 720);
+  }, { passive: false });
+
+  app.addEventListener('touchstart', (event) => {
+    touchStartX = event.touches[0].clientX;
+    touchStartY = event.touches[0].clientY;
+  }, { passive: true });
+  app.addEventListener('touchend', (event) => {
+    const dx = event.changedTouches[0].clientX - touchStartX;
+    const dy = event.changedTouches[0].clientY - touchStartY;
+    if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy)) move(dx < 0 ? 1 : -1);
+  }, { passive: true });
+
+  document.addEventListener('keydown', (event) => {
+    const rect = app.getBoundingClientRect();
+    const isTimelineInView = rect.top < window.innerHeight * 0.65 && rect.bottom > window.innerHeight * 0.35;
+    if (!isTimelineInView && document.activeElement?.closest('#timelineApp') !== app) return;
+    if (event.key === 'ArrowRight' || event.key === 'PageDown') {
+      event.preventDefault();
+      move(1);
+    }
+    if (event.key === 'ArrowLeft' || event.key === 'PageUp') {
+      event.preventDefault();
+      move(-1);
+    }
+  });
+
+  setActive(0);
+}
+
+async function initTimeline() {
+  const error = document.getElementById('timelineError');
+  try {
+    const items = await loadTimelineItems(getTimelineSourceUrl());
+    mountTimeline(items);
+  } catch (err) {
+    console.error('Timeline load failed:', err);
+    if (error) {
+      error.hidden = false;
+      error.textContent = '타임라인 데이터를 불러오지 못해 기본 전시 데이터를 표시합니다. Google Sheets가 웹에 게시되어 있는지, TimelineJS URL의 source 값이 올바른지 확인하세요.';
+    }
+    mountTimeline(TIMELINE_FALLBACK_ITEMS);
+  }
 }
 
 // 더미 모드일 때 메모리 내 임시 저장소
@@ -208,39 +580,30 @@ function sizeBadge(size) {
 }
 
 // 공연 데이터를 테이블 행으로 렌더링
-function renderArchive(data) {
-  document.getElementById('archiveBody').innerHTML = data.map(row => `
-    <tr>
-      <td class="td-year">${row.year}</td>
-      <td>${row.name}</td>
-      <td>${row.performers}</td>
-      <td>${row.note}</td>
-    </tr>
-  `).join('');
-}
-
-// 아카이브 초기 렌더링 + 검색어 필터링 (연도·이름·공연팀·특이사항 대상)
-function initArchive() {
-  renderArchive(ARCHIVE_DATA);
-  document.getElementById('archiveSearch').addEventListener('input', (e) => {
-    const q = e.target.value.toLowerCase().trim();
-    renderArchive(ARCHIVE_DATA.filter(row =>
-      row.year.toString().includes(q) ||
-      row.name.toLowerCase().includes(q) ||
-      row.performers.toLowerCase().includes(q) ||
-      row.note.toLowerCase().includes(q)
-    ));
-  });
-}
-
 // 햄버거 메뉴 토글 및 스크롤 시 내비바 그림자 적용
 function initNav() {
   const hamburger = document.getElementById('hamburger');
   const menu = document.getElementById('mobileMenu');
+  const nav = document.getElementById('navbar');
+
   hamburger.addEventListener('click', () => menu.classList.toggle('open'));
   menu.querySelectorAll('a').forEach(a => {
     a.addEventListener('click', () => menu.classList.remove('open'));
   });
+
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    const targetId = link.hash.slice(1);
+    const target = document.getElementById(targetId);
+    if (!target) return;
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      menu.classList.remove('open');
+      const offset = (nav?.offsetHeight || 72) + 20;
+      const top = Math.max(0, target.getBoundingClientRect().top + window.scrollY - offset);
+      window.scrollTo({ top, behavior: 'smooth' });
+    });
+  });
+
   window.addEventListener('scroll', () => {
     document.getElementById('navbar').style.boxShadow =
       window.scrollY > 20 ? '0 4px 24px rgba(0,0,0,0.3)' : 'none';
@@ -258,7 +621,7 @@ function initScrollReveal() {
     });
   }, { threshold: 0.08 });
 
-  document.querySelectorAll('.stat-item, .timeline-container, .archive-table tbody tr').forEach(el => {
+  document.querySelectorAll('.stat-item, .immersive-timeline').forEach(el => {
     el.style.opacity = '0';
     el.style.transform = 'translateY(20px)';
     el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
@@ -375,13 +738,12 @@ function initVideos() {
   });
 }
 
-// 페이지 로드 후 각 모듈 초기화 (갤러리 오버레이는 CSS 처리)
+// 페이지 로드 후 각 모듈 초기화
 document.addEventListener('DOMContentLoaded', () => {
   initNav();
   initStats();
   initTimeline();
   initMemory();
-  initArchive();
   initVideos();
   initHeroCanvas();
   initParallax();

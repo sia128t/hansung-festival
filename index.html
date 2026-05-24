@@ -18,7 +18,6 @@
         <li><a href="#timeline">역사</a></li>
         <li><a href="#memory">추억 남기기</a></li>
         <li><a href="#videos">영상</a></li>
-        <li><a href="#archive">아카이브</a></li>
       </ul>
       <button class="hamburger" id="hamburger" aria-label="메뉴">&#9776;</button>
     </div>
@@ -26,7 +25,6 @@
       <li><a href="#timeline">역사</a></li>
       <li><a href="#memory">추억 남기기</a></li>
       <li><a href="#videos">영상</a></li>
-      <li><a href="#archive">아카이브</a></li>
     </ul>
   </nav>
 
@@ -55,15 +53,24 @@
 
   <!-- TIMELINE -->
   <section class="timeline-section" id="timeline">
-    <div class="timeline-container" id="timelineContainer">
-      <p class="timeline-kicker">HSU FESTA TIMELINE</p>
-      <iframe
-        class="timeline-embed-frame"
-        id="timelineEmbed"
-        title="HSU Festa Timeline"
-        loading="lazy"
-        allowfullscreen
-      ></iframe>
+    <div class="immersive-timeline" id="timelineApp" aria-label="인터랙티브 타임라인">
+      <div class="timeline-loading" id="timelineLoading" role="status">Loading timeline...</div>
+      <div class="timeline-error" id="timelineError" role="alert" hidden></div>
+
+      <div class="timeline-scenes" id="timelineScenes" aria-live="polite"></div>
+
+      <button class="timeline-nav-btn timeline-prev" id="timelinePrev" type="button" aria-label="이전 타임라인">
+        <span aria-hidden="true">‹</span>
+      </button>
+      <button class="timeline-nav-btn timeline-next" id="timelineNext" type="button" aria-label="다음 타임라인">
+        <span aria-hidden="true">›</span>
+      </button>
+
+      <div class="timeline-progress" aria-hidden="true">
+        <div class="timeline-progress-bar" id="timelineProgressBar"></div>
+      </div>
+
+      <nav class="timeline-axis" id="timelineAxis" aria-label="타임라인 연도 선택"></nav>
     </div>
   </section>
 
@@ -192,35 +199,6 @@
     </p>
   </section>
 
-  <!-- ARCHIVE TABLE -->
-  <section class="archive-section" id="archive">
-    <div class="section-header">
-      <p class="section-label">ARCHIVE</p>
-      <h2>공연 아카이브</h2>
-      <p class="section-desc">역대 공연팀과 행사 정보를 검색해보세요</p>
-    </div>
-
-    <div class="archive-search">
-      <input type="search" id="archiveSearch" placeholder="공연팀, 행사명, 연도로 검색..." />
-    </div>
-
-    <div class="archive-table-wrap">
-      <table class="archive-table" id="archiveTable">
-        <thead>
-          <tr>
-            <th>연도</th>
-            <th>축제명</th>
-            <th>메인 공연</th>
-            <th>특이사항</th>
-          </tr>
-        </thead>
-        <tbody id="archiveBody">
-          <!-- JS로 렌더링 -->
-        </tbody>
-      </table>
-    </div>
-  </section>
-
   <!-- CONTACT -->
   <section class="contact-section" id="contact">
     <div class="section-header">
@@ -288,7 +266,6 @@
           <li><a href="#timeline">축제 역사</a></li>
           <li><a href="#memory">추억 남기기</a></li>
           <li><a href="#videos">영상</a></li>
-          <li><a href="#archive">공연 아카이브</a></li>
           <li><a href="#contact">문의하기</a></li>
         </ul>
       </div>
