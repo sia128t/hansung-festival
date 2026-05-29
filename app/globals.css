@@ -114,7 +114,6 @@ body {
   overflow: hidden;
 }
 
-/* 파티클 캔버스 */
 #heroCanvas {
   position: absolute;
   inset: 0;
@@ -141,7 +140,6 @@ body {
   100% { background-position: 15% 55%, 85% 15%, 65% 85%; filter: brightness(0.95); }
 }
 
-/* 떠다니는 빛 오브 (랜턴 느낌) */
 .orb {
   position: absolute;
   border-radius: 50%;
@@ -197,7 +195,6 @@ body {
   text-align: center;
   padding: 0 24px;
   animation: fadeUp 0.9s ease both;
-  /* 패럴렉스 스크롤 시 JS가 transform으로 제어 */
   will-change: transform, opacity;
 }
 
@@ -336,8 +333,6 @@ body {
   text-align: center;
 }
 
-.stat-item {}
-
 .stat-num {
   display: block;
   font-size: clamp(2rem, 5vw, 3.5rem);
@@ -472,7 +467,6 @@ section {
   outline: none;
 }
 
-/* select 기본 화살표 유지 + 색상 보정 */
 .form-group select {
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238b87a8' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
@@ -529,7 +523,6 @@ section {
   background: rgba(79,70,229,0.1);
 }
 
-/* Memory Wall */
 .memory-wall h3 {
   font-size: 1rem;
   font-weight: 700;
@@ -933,7 +926,6 @@ a.contact-value:hover {
   font-size: 0.75rem;
   line-height: 1.8;
 }
-
 
 .footer h4 {
   font-size: 0.82rem;
